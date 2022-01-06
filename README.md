@@ -1,2 +1,24 @@
-# Dandelion_Todo
-Project for Mobile Internet Lesson in Autumn 2021. Aim to develop a multi-functional application to manage tasks.
+# dandelion_todo
+
+## Project setup
+```
+npm install
+```
+
+### Compiles and hot-reloads for development
+```
+npm run serve
+```
+
+### Compiles and minifies for production
+```
+npm run build
+```
+
+### Lints and fixes files
+```
+npm run lint
+```
+
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).
