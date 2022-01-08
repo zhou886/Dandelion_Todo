@@ -1,4 +1,4 @@
-# dandelion_todo
+# dandeliontodo
 
 ## Project setup
 ```
