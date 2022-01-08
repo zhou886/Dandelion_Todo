@@ -2,6 +2,7 @@
   <el-menu
     class="el-menu-vertical-demo"
     :collapse="isCollapse"
+    :default-active="activeMenu"
   >
     <h3 v-show="!isCollapse">菜单栏</h3>
     <h3 v-show="isCollapse">菜单</h3>
@@ -70,12 +71,16 @@ export default {
   },
   methods: {
     itemClick (item) {
-      this.$router.push({ name: item.name })
+      if (this.$route.name !== item.name) { this.$router.push({ name: item.name }) }
     }
   },
   computed: {
     isCollapse () {
       return this.$store.state.asideCollapse.isCollapse
+    },
+    activeMenu () {
+      const route = this.$route
+      return route.path
     }
   }
 }

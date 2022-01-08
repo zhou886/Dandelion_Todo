@@ -16,8 +16,12 @@
       <el-dropdown size="small">
         <el-button icon="el-icon-user" size="small" circle></el-button>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item>个人中心</el-dropdown-item>
-          <el-dropdown-item>退出</el-dropdown-item>
+          <el-dropdown-item>
+            <span @click="goToMainUser()">个人中心</span>
+          </el-dropdown-item>
+          <el-dropdown-item>
+            <span @click="userExit()">退出登录</span>
+          </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
@@ -42,13 +46,16 @@ header {
 <script>
 export default {
   data () {
-    return {
-    }
+    return {}
   },
   methods: {
     collapseMenu () {
       this.$store.commit('collapseMenu')
-    }
+    },
+    goToMainUser () {
+      if (this.$route.name !== 'user') { this.$router.push({ name: 'user' }) }
+    },
+    userExit () {}
   }
 }
 </script>
