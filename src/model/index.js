@@ -2,39 +2,14 @@
 class TimeStamp {
   constructor (timeObj) {
     if (timeObj instanceof Date) {
-      this.timeDateObj = new Date(timeObj.time)
-      this.date = timeObj.getDate()
-      this.hours = timeObj.getHours()
-      this.minutes = timeObj.getMinutes()
-      this.month = timeObj.getMonth()
-      this.nanos = 0
-      this.seconds = timeObj.getSeconds()
-      this.time = timeObj.getTime()
-      this.year = timeObj.getFullYear()
-    } else if (typeof (timeObj) === 'object') {
-      this.date = timeObj.date
-      this.hours = timeObj.hours
-      this.minutes = timeObj.minutes
-      this.month = timeObj.month
-      this.nanos = timeObj.nanos
-      this.seconds = timeObj.seconds
-      this.time = timeObj.time
-      this.year = timeObj.year
-      this.timeDateObj = new Date(timeObj.time)
+      this.timeDateObj = timeObj
+    } else if (typeof (timeObj) === 'number') {
+      this.timeDateObj = new Date(timeObj)
     }
   }
 
   GetTimeStampJson () {
-    return {
-      date: this.timeDateObj.getDate(),
-      hours: this.timeDateObj.getHours(),
-      minutes: this.timeDateObj.getMinutes(),
-      month: this.timeDateObj.getMonth(),
-      nanos: 0,
-      seconds: this.timeDateObj.getSeconds(),
-      time: this.timeDateObj.getTime(),
-      year: this.timeDateObj.getFullYear()
-    }
+    return this.timeDateObj.getTime()
   }
 
   GetTime () {
