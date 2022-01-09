@@ -1,7 +1,6 @@
 <template>
   <div class="done">
-    <el-card></el-card>
-    <el-table stripe height="200" :data="todoEntity">
+    <el-table stripe height="200" :data="doneList">
       <el-table-column prop="title" label="标题" width="180"></el-table-column>
       <el-table-column
         prop="description"
@@ -36,23 +35,15 @@
 export default {
   data () {
     return {
-      todoEntity: [
-        {
-          createAt: '2022-01-06-12-40',
-          completeAt: '2022-01-09-21-40',
-          deadline: '2022-01-10-23-30',
-          title: '人工智能基础大作业',
-          description: '写一个BIT robot'
-        }
-      ]
     }
   },
   methods: {
-    checkButtonClick () {
-
-    },
-    closeButtonClick () {
-
+  },
+  computed: {
+    doneList () {
+      // 向拉取doneList的数据
+      // 然后用this.$store.commit('addDoneEntity, doneEntity')加到vuex里面
+      return this.$store.state.doneRepository.doneList
     }
   }
 }
