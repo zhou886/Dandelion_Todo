@@ -11,16 +11,34 @@
 </template>
 
 <style lang="scss" scoped>
-html,
-body,
-#app,
+.home,
 .el-container {
   height: 100%;
+  overflow: hidden;
 }
 
 .el-header {
-  height: 100%;
+  position: relative;
+  height: 60px;
   background-color: whitesmoke;
+  overflow: hidden;
+}
+
+.el-aside {
+  overflow: hidden;
+  position: relative;
+  left: 0;
+  top: 0;
+}
+.el-main {
+  overflow: hidden;
+  position: relative;
+  padding: 5px;
+  margin: 0px;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  height: 100%;
 }
 </style>
 
