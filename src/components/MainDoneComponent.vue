@@ -2,12 +2,35 @@
   <div class="done">
     <el-container>
       <el-header>
-        <el-col :xs="24" :span="8">
-          <el-input
-            v-model="search"
-            placeholder="请输入要查找的标题关键词"
-          ></el-input>
-        </el-col>
+        <el-row type="flex" align="middle">
+          <el-col :xs="16" :span="16">
+            <el-input
+              v-model="search"
+              prefix-icon="el-icon-search"
+              placeholder="请输入要查找的标题关键词"
+              clearable
+            ></el-input>
+          </el-col>
+          <el-col :xs="8" :span="8">
+            <el-dropdown style="float: right" @command="handleCommand">
+              <el-button
+                icon="el-icon-sort"
+                type="primary"
+                round
+                class="btnSort"
+              ></el-button>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item
+                  v-for="item in sortOption"
+                  :key="item.value"
+                  :command="item.value"
+                >
+                  {{ item.label }}
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </el-col>
+        </el-row>
       </el-header>
       <el-divider></el-divider>
       <el-main>
@@ -41,8 +64,8 @@
             </div>
             <div class="discripion">
               <h3>详细描述</h3>
-              <p v-if="!item.discription">无</p>
-              <p v-else>{{ item.discription }}</p>
+              <p v-if="!item.description">无</p>
+              <p v-else>{{ item.description }}</p>
             </div>
             <div class="deadline">
               <h3>截止时间</h3>
@@ -60,6 +83,12 @@
 </template>
 
 <style lang="scss" scoped>
+.btnSort {
+  float: right;
+  padding: 8px;
+  margin-right: 5px;
+}
+
 .done {
   height: 100%;
   .el-container,
@@ -129,12 +158,34 @@ p {
 export default {
   data () {
     return {
-      search: ''
+      search: '',
+      sortSelect: '',
+      sortOption: [
+        {
+          value: 1,
+          label: '按标题排序'
+        },
+        {
+          value: 2,
+          label: '按创建时间排序'
+        },
+        {
+          value: 3,
+          label: '按截止时间排序'
+        },
+        {
+          value: 4,
+          label: '按完成时间排序'
+        }
+      ]
     }
   },
   methods: {
     deleteButtonClick (item) {
       this.$store.commit('removeDoneEntity', item)
+    },
+    handleCommand (command) {
+      this.sortSelect = command
     }
   },
   computed: {
@@ -142,6 +193,50 @@ export default {
       // 向拉取doneList的数据
       // 然后用this.$store.commit('addDoneEntity, doneEntity')加到vuex里面
       const tmpList = this.$store.state.doneRepository.doneList
+      function compareTitle (x, y) {
+        if (x.title < y.title) {
+          return -1
+        } else {
+          return 1
+        }
+      }
+      function compareCreateAt (x, y) {
+        if (x.createAt < y.createAt) {
+          return -1
+        } else {
+          return 1
+        }
+      }
+      function compareDeadline (x, y) {
+        if (x.deadline < y.deadline) {
+          return -1
+        } else {
+          return 1
+        }
+      }
+      function compareCompleteAt (x, y) {
+        if (x.completeAt < y.completeAt) {
+          return -1
+        } else {
+          return 1
+        }
+      }
+      if (this.sortSelect) {
+        switch (this.sortSelect) {
+          case 1:
+            tmpList.sort(compareTitle)
+            break
+          case 2:
+            tmpList.sort(compareCreateAt)
+            break
+          case 3:
+            tmpList.sort(compareDeadline)
+            break
+          case 4:
+            tmpList.sort(compareCompleteAt)
+            break
+        }
+      }
       if (this.search) {
         return tmpList.filter((item) => {
           return item.title.includes(this.search)

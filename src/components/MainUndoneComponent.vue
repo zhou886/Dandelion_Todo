@@ -3,18 +3,28 @@
     <el-container>
       <el-header>
         <div class="addTodoArea">
-          <el-row>
-            <el-col :span="8" :xs="14">
+          <el-row
+            type="flex"
+            justify="end"
+            align="middle">
+            <el-col :span="8" :xs="8">
               <el-input
                 v-model="search"
-                placeholder="请输入要查找的标题关键词"
+                :placeholder="elInputPlaceholder"
+                prefix-icon="el-icon-search"
+                clearable
               ></el-input>
             </el-col>
-            <el-col :span="16" :xs="10">
+            <el-col :span="16" :xs="16" class="colAlignRight">
+              <el-dropdown style="float: right" @command="handleCommand">
+                <el-button icon="el-icon-sort" type="primary" round class="btnSort"></el-button>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item v-for="item in sortOption" :key="item.value" :command="item.value">{{item.label}}</el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
               <el-button
                 type="primary"
                 round
-                size="small"
                 @click="dialogVisible = true"
                 class="btnAdd"
               >
@@ -23,7 +33,7 @@
               <el-dialog
                 title="添加TODO"
                 :visible.sync="dialogVisible"
-                width="40%"
+                :width="dialogWidth"
                 :before-close="handleClose"
               >
                 <el-row>
@@ -38,18 +48,30 @@
                     class="todoInput"
                     v-model="todoDescription"
                     placeholder="TODO详细描述"
-                    type="textarea"
-                    :autosize="{ minRows: 1, maxRows: 4 }"
                   ></el-input>
                 </el-row>
+                <el-row>
+                  <el-date-picker
+                    v-model="todoDeadline"
+                    type="datetime"
+                    placeholder="选择截止时间"
+                    align="center"
+                    style="width: 100%; margin-left: 5px"
+                  ></el-date-picker>
+                </el-row>
                 <span slot="footer" class="dialog-footer">
-                  <el-button @click="dialogVisible = false" round>
+                  <el-button
+                    @click="dialogVisible = false"
+                    round
+                    class="btnAddTodoDialog"
+                  >
                     取 消
                   </el-button>
                   <el-button
                     type="primary"
-                    @click="dialogVisible = false"
+                    @click="createTodoEntity(todoTitle, todoDescription, todoDeadline)"
                     round
+                    class="btnAddTodoDialog"
                   >
                     确 定
                   </el-button>
@@ -96,7 +118,7 @@
                   </el-col>
                 </el-row>
               </div>
-              <div class="discription">
+              <div class="description">
                 <h3>详细描述</h3>
                 <p v-if="!item.description">无</p>
                 <p v-else>{{ item.description }}</p>
@@ -114,6 +136,19 @@
 </template>
 
 <style lang="scss" scoped>
+
+.btnSort,
+.btnAdd {
+  float: right;
+  padding: 10px;
+  margin-right: 5px;
+}
+
+.btnAddTodoDialog {
+  margin: 10px;
+  margin-top: -100%;
+}
+
 .undone {
   height: 100%;
   .el-container,
@@ -140,17 +175,6 @@
 .addTodoArea {
   .todoInput {
     margin: 5px;
-  }
-  .btnAdd {
-    margin: 0px;
-    float: right;
-  }
-  .dialog-footer {
-    .el-button {
-      padding: 12px;
-      float: right;
-      margin-top: -30px;
-    }
   }
 }
 
@@ -203,19 +227,63 @@ export default {
       dialogVisible: false,
       todoTitle: '',
       todoDescription: '',
-      todoDeadline: ''
+      todoDeadline: '',
+      sortSelect: '',
+      sortOption: [
+        {
+          value: 1,
+          label: '按标题排序'
+        },
+        {
+          value: 2,
+          label: '按创建时间排序'
+        },
+        {
+          value: 3,
+          label: '按截止时间排序'
+        }
+      ]
     }
   },
   methods: {
     handleClose (done) {
-      this.$confirm('确认关闭？')
-        .then((_) => {
-          done()
-        })
-        .catch((_) => {})
+      done()
+    },
+    createTodoEntity (todoTitle, todoDescription, todoDeadline) {
+      // 创建TODO，向服务发送创建TODO请求
+      if (!todoTitle) {
+        alert('TODO标题不能为空!')
+        return
+      }
+      if (!todoDeadline) {
+        alert('TODO截止时间不能为空!')
+        return
+      }
+      const d = todoDeadline
+      const year = d.getFullYear().toString()
+      const month = (d.getMonth() + 1).toString()
+      const day = d.getDate().toString()
+      const hour = d.getHours().toString()
+      var minite = ''
+      if (d.getMinutes() < 10) {
+        minite = '0' + d.getMinutes().toString()
+      } else {
+        minite = d.getMinutes().toString()
+      }
+      const time = year + '-' + month + '-' + day + '-' + hour + '-' + minite
+      const todoEntity = {
+        title: todoTitle,
+        description: todoDescription,
+        deadline: time
+      }
+      this.$store.commit('addTodoEntity', todoEntity)
+      this.todoTitle = ''
+      this.todoDescription = ''
+      this.todoDeadline = ''
+      this.dialogVisible = false
     },
     finishButtonClick (todoEntity) {
-      // TODO完成，向服务器发送完成时间
+      // 完成TODO，向服务器发送完成TODO请求
       const d = new Date()
       const year = d.getFullYear().toString()
       const month = (d.getMonth() + 1).toString()
@@ -234,6 +302,9 @@ export default {
     },
     deleteButtonClick (todoEntity) {
       this.$store.commit('removeTodoEntity', todoEntity)
+    },
+    handleCommand (command) {
+      this.sortSelect = command
     }
   },
   computed: {
@@ -241,6 +312,28 @@ export default {
       // 向拉取TODOList的数据
       // 然后用this.$store.commit('addTodoEntity', todoEntity)加到vuex里面
       const tmpList = this.$store.state.undoneRepository.todoList
+      function compareTitle (x, y) {
+        if (x.title < y.title) { return -1 } else { return 1 }
+      }
+      function compareCreateAt (x, y) {
+        if (x.createAt < y.createAt) { return -1 } else { return 1 }
+      }
+      function compareDeadline (x, y) {
+        if (x.deadline < y.deadline) { return -1 } else { return 1 }
+      }
+      if (this.sortSelect) {
+        switch (this.sortSelect) {
+          case 1:
+            tmpList.sort(compareTitle)
+            break
+          case 2:
+            tmpList.sort(compareCreateAt)
+            break
+          case 3:
+            tmpList.sort(compareDeadline)
+            break
+        }
+      }
       if (this.search) {
         return tmpList.filter((item) => {
           return item.title.includes(this.search)
@@ -248,6 +341,14 @@ export default {
       } else {
         return tmpList
       }
+    },
+    dialogWidth () {
+      const tmp = document.body.clientWidth
+      if (tmp < 800) { return '100%' } else if (tmp < 1024) { return '75%' } else { return '50%' }
+    },
+    elInputPlaceholder () {
+      const tmp = document.body.clientWidth
+      if (tmp < 800) { return '' } else { return '请输入要查找的标题关键词' }
     }
   }
 }
