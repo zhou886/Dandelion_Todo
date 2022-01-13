@@ -21,4 +21,11 @@ body,
   padding: 0;
   height: 100%;
 }
+
+.el-popconfirm__action {
+  .el-button {
+    padding: 8px;
+    border-radius: 20px;
+  }
+}
 </style>

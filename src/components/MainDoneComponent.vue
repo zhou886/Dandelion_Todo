@@ -2,7 +2,7 @@
   <div class="done">
     <el-container>
       <el-header>
-        <el-row type="flex" align="middle">
+        <el-row type="flex" align="middle" justify="end">
           <el-col :xs="16" :span="16">
             <el-input
               v-model="search"
@@ -85,7 +85,7 @@
 <style lang="scss" scoped>
 .btnSort {
   float: right;
-  padding: 8px;
+  padding: 10px;
   margin-right: 5px;
 }
 

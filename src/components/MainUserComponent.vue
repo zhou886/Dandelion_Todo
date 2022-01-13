@@ -5,20 +5,22 @@
         <el-card class="box-card">
           <div slot="header" class="clearfix">
             <el-row>
-              <el-col :span="6" :xs="12">
+              <el-col :span="12">
                 <el-image :src="userAvator" fit="fill"></el-image>
               </el-col>
-              <el-col :span="16" :xs="12">
-                <el-button plain round class="btnChangeAvator">更改头像</el-button>
+              <el-col :span="12">
+                <el-button plain round class="btnChangeAvator">
+                  更改头像
+                </el-button>
               </el-col>
             </el-row>
           </div>
           <div class="clearfix" v-for="(item, index) in userInfo" :key="index">
             <el-row>
-              <el-col :span="6" :xs="12">
+              <el-col :span="12">
                 <div class="grid-content">{{ item.label }}</div>
               </el-col>
-              <el-col :span="16" :xs="12">
+              <el-col :span="12">
                 <div class="grid-content">{{ item.content }}</div>
               </el-col>
             </el-row>
@@ -29,83 +31,94 @@
     <el-row>
       <el-card class="box-card">
         <div slot="header" class="clearfix">
-          <span>暗杀者名单</span>
-          <el-popover placement="right" width="160" v-model="visible">
-            <p style="margin-top: 3px">请输入您要暗杀的用户ID</p>
-            <el-input
-              placeholder="请输入用户ID"
-              v-model="input"
-              clearable
-            ></el-input>
-            <br />
-            <div style="text-align: right; margin: 0; margin-top: 10px">
-              <el-button size="mini" type="text" @click="visible = false">
-                取消
-              </el-button>
-              <el-button type="primary" size="mini" @click="visible = false">
-                确定
-              </el-button>
-            </div>
-            <el-button
-              style="float: right; padding: 5px; margin-right: 83px"
-              slot="reference"
-              plain
-              round
-              icon="el-icon-plus"
-            ></el-button>
-          </el-popover>
+          <el-row type="flex" align="middle">
+            <el-col :span="12">
+              <span>观察者名单</span>
+            </el-col>
+            <el-col :span="12">
+              <el-popover placement="right" width="200" v-model="visible">
+                <p style="margin-top: 3px">请输入您要观察的用户昵称</p>
+                <el-input
+                  placeholder="请输入用户昵称"
+                  v-model="input"
+                  clearable
+                ></el-input>
+                <div style="text-align: right; margin: 0; margin-top: 10px">
+                  <el-button
+                    size="mini"
+                    type="text"
+                    @click="visible = false"
+                    round
+                  >
+                    取消
+                  </el-button>
+                  <el-button
+                    type="primary"
+                    size="mini"
+                    round
+                    @click="visible = false"
+                  >
+                    确定
+                  </el-button>
+                </div>
+                <el-button
+                  slot="reference"
+                  type="primary"
+                  round
+                  class="btnAddWatch"
+                  style="margin-right: 22px"
+                  icon="el-icon-plus"
+                ></el-button>
+              </el-popover>
+            </el-col>
+          </el-row>
         </div>
         <div class="clearfix">
-          <el-table :data="watchList" stripe height="200">
-            <el-table-column
-              prop="nickname"
-              label="昵称"
-              width="120"
-            ></el-table-column>
-            <el-table-column
-              prop="userId"
-              label="用户ID"
-              width="120"
-            ></el-table-column>
-            <el-table-column label="操作" width="120">
-              <template slot-scope="scope">
-                <el-popover
-                  placement="right"
-                  width="160"
-                  v-model="scope.row.visible"
-                >
-                  <p style="margin-top: 5px">
-                    您确定要从暗杀者名单中删除ID为{{
-                      scope.row.userId
-                    }}的用户吗?
-                  </p>
-                  <div style="text-align: right; margin: 0">
-                    <el-button
-                      size="mini"
-                      type="text"
-                      @click="scope.row.visible = false"
+          <el-row v-for="(item, index) in watchList" :key="index">
+            <el-card>
+              <div slot="header">
+                <el-row>
+                  <el-col :span="12">
+                    <img :src="getUserAvator(item.userId)" />
+                  </el-col>
+                  <el-col :span="12">
+                    <el-popconfirm
+                      title="确定要删除该名用户吗?"
+                      confirm-button-text="确定"
+                      cancel-button-text="取消"
+                      @confirm="confirmDeleteUser(item)"
                     >
-                      取消
-                    </el-button>
-                    <el-button
-                      type="primary"
-                      size="mini"
-                      @click="confirmDeleteUser(scope.row.userId, scope.$index)"
-                    >
-                      确定
-                    </el-button>
-                  </div>
-                  <el-button
-                    slot="reference"
-                    type="danger"
-                    round
-                    icon="el-icon-minus"
-                    class="minus-button"
-                  ></el-button>
-                </el-popover>
-              </template>
-            </el-table-column>
-          </el-table>
+                      <el-button
+                        icon="el-icon-minus"
+                        type="danger"
+                        round
+                        class="btnDeleteWatch"
+                        slot="reference"
+                      ></el-button>
+                    </el-popconfirm>
+                  </el-col>
+                </el-row>
+              </div>
+              <div class="clearfix">
+                <el-row>
+                  <el-col :span="12">
+                    <span>昵称</span>
+                  </el-col>
+                  <el-col :span="12">
+                    <span>{{ item.nickname }}</span>
+                  </el-col>
+                </el-row>
+                <el-row>
+                  <el-col :span="12">
+                    <span>用户ID</span>
+                  </el-col>
+                  <el-col :span="12">
+                    <span>{{ item.userId }}</span>
+                  </el-col>
+                </el-row>
+              </div>
+            </el-card>
+          </el-row>
         </div>
       </el-card>
     </el-row>
@@ -113,6 +126,16 @@
 </template>
 
 <style lang="scss" scoped>
+.btnAddWatch,
+.btnDeleteWatch {
+  float: right;
+}
+
+.el-button {
+  padding: 8px;
+  margin: 0;
+}
+
 .user {
   height: 100%;
   overflow-y: auto;
@@ -178,6 +201,10 @@
 .minus-button {
   padding: 5px 5px;
 }
+
+.el-card {
+  margin: 2px;
+}
 </style>
 
 <script>
@@ -201,29 +228,22 @@ export default {
         }
       ],
       userAvator:
-        'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
-      watchList: [
-        {
-          nickname: 'hyp',
-          userId: 110,
-          visible: false
-        },
-        {
-          nickname: 'zyx',
-          userId: 120,
-          visible: false
-        }
-      ]
+        'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
     }
   },
-  computed: {},
+  computed: {
+    watchList () {
+      // 向服务器发送获得watchList请求，把返回得到的watchList
+      // 用this.$store.commit('getWatchList', currentWatchList)加到vuex中
+      console.log(this.$store.state.watchList.watchList)
+      return this.$store.state.watchList.watchList
+    }
+  },
   methods: {
-    setVisibleFalse () {
-      this.visible = false
-    },
-    confirmDeleteUser (id, index) {
+    getUserAvator (userId) {},
+    confirmDeleteUser (user) {
       // 给服务器发消息删掉对应的id
-      this.watchList.splice(index, 1)
+      this.$store.commit('removeWatched', user)
     }
   }
 }

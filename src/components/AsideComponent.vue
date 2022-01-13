@@ -49,10 +49,10 @@ export default {
           path: '/done'
         },
         {
-          label: '种树记录',
-          name: 'record',
-          icon: 'document',
-          path: '/record'
+          label: '种树',
+          name: 'plating',
+          icon: 'timer',
+          path: '/plating'
         },
         {
           label: '个人中心',
