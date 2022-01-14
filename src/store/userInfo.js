@@ -4,7 +4,8 @@ export default {
       id: 114514,
       nickname: 'hhm',
       role: '普通角色'
-    }
+    },
+    token: ''
   },
   mutations: {
     getUserInfo (state, currentUserInfo) {
@@ -12,6 +13,9 @@ export default {
     },
     changeNickname (state, newNickname) {
       state.userInfo.nickname = newNickname
+    },
+    setToken (state, _token) {
+      state.token = _token
     }
   }
 }

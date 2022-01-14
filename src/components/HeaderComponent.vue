@@ -9,7 +9,6 @@
         size="small"
         @click="collapseMenu()"
       ></el-button>
-      <span>主页</span>
     </div>
 
     <div class="right-header">

@@ -20,7 +20,7 @@
 .el-header {
   position: relative;
   height: 60px;
-  background-color: whitesmoke;
+  background-color: #F2F6FC;
   overflow: hidden;
 }
 

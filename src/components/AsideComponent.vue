@@ -24,6 +24,7 @@
     color: #303133;
   }
   height: 100vh;
+  background-color: whitesmoke;
 }
 
 .el-menu-item {
@@ -59,12 +60,6 @@ export default {
           name: 'user',
           icon: 'user',
           path: '/user'
-        },
-        {
-          label: '设置',
-          name: 'setting',
-          icon: 'setting',
-          path: '/setting'
         }
       ]
     }

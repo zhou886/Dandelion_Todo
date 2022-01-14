@@ -15,13 +15,29 @@
               </el-col>
             </el-row>
           </div>
-          <div class="clearfix" v-for="(item, index) in userInfo" :key="index">
+          <div class="clearfix">
             <el-row>
               <el-col :span="12">
-                <div class="grid-content">{{ item.label }}</div>
+                <span>昵称</span>
               </el-col>
               <el-col :span="12">
-                <div class="grid-content">{{ item.content }}</div>
+                <span>{{ userInfo.nickname }}</span>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <span>用户ID</span>
+              </el-col>
+              <el-col :span="12">
+                <span>{{ userInfo.id }}</span>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <span>角色</span>
+              </el-col>
+              <el-col :span="12">
+                <span>{{ userInfo.role }}</span>
               </el-col>
             </el-row>
           </div>
@@ -38,11 +54,22 @@
             <el-col :span="12">
               <el-popover placement="right" width="200" v-model="visible">
                 <p style="margin-top: 3px">请输入您要观察的用户昵称</p>
-                <el-input
-                  placeholder="请输入用户昵称"
+                <el-select
                   v-model="input"
-                  clearable
-                ></el-input>
+                  filterable
+                  remote
+                  reserve-keyword
+                  placeholder="请选择用户"
+                  :remote-method="remoteMethod(input)"
+                  :loading="loading"
+                >
+                  <el-option
+                    v-for="(item, index) in options"
+                    :key="index"
+                    :label="item.id"
+                    :value="item.nickname"
+                  ></el-option>
+                </el-select>
                 <div style="text-align: right; margin: 0; margin-top: 10px">
                   <el-button
                     size="mini"
@@ -56,7 +83,7 @@
                     type="primary"
                     size="mini"
                     round
-                    @click="visible = false"
+                    @click="btnAddWatchClick()"
                   >
                     确定
                   </el-button>
@@ -75,11 +102,11 @@
         </div>
         <div class="clearfix">
           <el-row v-for="(item, index) in watchList" :key="index">
-            <el-card>
+            <el-card shadow="hover">
               <div slot="header">
                 <el-row>
                   <el-col :span="12">
-                    <img :src="getUserAvator(item.userId)" />
+                    <el-image :src="getUserAvator(item.userId)" />
                   </el-col>
                   <el-col :span="12">
                     <el-popconfirm
@@ -144,6 +171,10 @@
 
 .text {
   font-size: 14px;
+}
+
+.el-select {
+  margin-top: 5px;
 }
 
 .btnChangeAvator {
@@ -212,39 +243,57 @@ export default {
   data () {
     return {
       input: '',
-      visible: false,
-      userInfo: [
-        {
-          label: '昵称',
-          content: 'hhm'
-        },
-        {
-          label: '用户ID',
-          content: 114514
-        },
-        {
-          label: '角色',
-          content: '普通用户'
-        }
-      ],
-      userAvator:
-        'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
+      loading: false,
+      options: [],
+      visible: false
     }
   },
   computed: {
     watchList () {
       // 向服务器发送获得watchList请求，把返回得到的watchList
       // 用this.$store.commit('getWatchList', currentWatchList)加到vuex中
-      console.log(this.$store.state.watchList.watchList)
       return this.$store.state.watchList.watchList
+    },
+    userAvator () {
+      // 向服务器发送获取头像的请求，再返回url或者图片
+      // 用户id是this.userInfo.id
+      return ''
+    },
+    userInfo () {
+      return this.$store.state.userInfo.userInfo
     }
   },
   methods: {
-    getUserAvator (userId) {},
+    getUserAvator (id) {
+      // 向服务器发送获取头像的请求，再返回url或者图片
+      // 用户id是id
+      return ''
+    },
     confirmDeleteUser (user) {
       // 给服务器发消息删掉对应的id
       this.$store.commit('removeWatched', user)
-    }
+    },
+    remoteMethod (query) {
+      console.log('1')
+      if (query) {
+        this.loading = true
+        // 向服务器发送请求，获取所有昵称中带有关键词query的用户
+        // 把用户ID、头像?拉取到this.options
+        setTimeout(() => {
+          this.loading = false
+          // 举个例子
+          this.options = [
+            {
+              id: 123,
+              nickname: 'hhh'
+            }
+          ]
+        }, 500)
+      } else {
+        this.options = []
+      }
+    },
+    btnAddWatchClick () {}
   }
 }
 </script>

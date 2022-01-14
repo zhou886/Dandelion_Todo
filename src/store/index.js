@@ -5,6 +5,7 @@ import doneRepository from './doneRepository'
 import undoneRepository from './undoneRepository'
 import userInfo from './userInfo'
 import watchList from './watchList'
+import timerInfo from './timerInfo'
 
 Vue.use(Vuex)
 
@@ -16,6 +17,6 @@ export default new Vuex.Store({
   actions: {
   },
   modules: {
-    asideCollapse, doneRepository, undoneRepository, userInfo, watchList
+    asideCollapse, doneRepository, undoneRepository, userInfo, watchList, timerInfo
   }
 })
