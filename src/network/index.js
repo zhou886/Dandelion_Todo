@@ -42,7 +42,7 @@ class NetWork {
    * 注册函数
    * @param {string} nickname
    * @param {string} password
-   * @returns {UserEntity} user
+   * @returns {UserEntity} user信息，使用UserEntity
    */
   async Register (nickname, password) {
     const res = await fetch(`${this.loc}/register`, {
@@ -51,9 +51,12 @@ class NetWork {
         password: password
       }),
       headers: {
-        'content-type': 'application/json'
-      }
+        'content-type': 'application/json;charset=utf-8'
+      },
+      method: 'POST'
     })
+    this.currPassword = password
+    this.currNickname = nickname
     const resJson = await res.json()
     if (resJson.status === 200) {
       return new UserEntity(resJson.data)
@@ -109,7 +112,7 @@ class NetWork {
     const resStatus = await res.status
     const resJson = await res.json()
     if (resJson.status === 200 && resStatus === 200) {
-      const resData = JSON.parse(resJson.data)
+      const resData = resJson.data
       const res = []
       resData.forEach(e => res.push(new TodoEntity(e)))
       return res
@@ -134,7 +137,8 @@ class NetWork {
     const res = await fetch(`${this.loc}/api/todo/${userid}`, {
       method: 'POST',
       headers: {
-        Authorization: this.session
+        Authorization: this.session,
+        'content-type': 'application/json;charset=utf-8'
       },
       body: JSON.stringify(todoList.map(e => e.parseJson()))
     })
@@ -162,13 +166,15 @@ class NetWork {
     const res = await fetch(`${this.loc}/api/todo/${userid}/new`, {
       method: 'POST',
       headers: {
-        Authorization: this.session
+        Authorization: this.session,
+        'content-type': 'application/json;charset=utf-8'
       },
       body: JSON.stringify(todoItem.parseJson())
     })
     const resStatus = await res.status
     const resJson = await res.json()
     if (resJson.status === 200 && resStatus === 200) {
+      return new TodoEntity(resJson.data)
     } else if (resJson != null) {
       if (resJson.status === 403) {
         await this.Login(this.currUserId, this.currPassword)
@@ -223,8 +229,10 @@ class NetWork {
     const res = await fetch(`${this.loc}/api/todo/${userid}/${todoid}`, {
       method: 'PUT',
       headers: {
-        Authorization: this.session
-      }
+        Authorization: this.session,
+        'content-type': 'application/json;charset=utf-8'
+      },
+      body: JSON.stringify(todoItem.parseJson())
     })
     const resStatus = await res.status
     const resJson = await res.json()
@@ -250,11 +258,12 @@ class NetWork {
     const res = await fetch(`${this.loc}/api/todo/${userid}/${todoid}`, {
       method: 'DELETE',
       headers: {
-        Authorization: this.session
+        Authorization: this.session,
+        'content-type': 'application/json;charset=utf-8'
       },
-      data: JSON.stringify({
+      body: JSON.stringify({
         todoId: todoid,
-        userId: userid
+        creatorId: userid
       })
     })
     const resStatus = await res.status
@@ -365,7 +374,8 @@ class NetWork {
     const res = await fetch(`${this.loc}/api/user/${userid}/avatar`, {
       method: 'POST',
       headers: {
-        Authorization: this.session
+        Authorization: this.session,
+        'content-type': 'application/json;charset=utf-8'
       },
       body: image
     })
@@ -419,10 +429,14 @@ class NetWork {
    */
   async UpdateDetailInfo (ndata, userid = this.currUserId) {
     ndata.userId = userid
+    if (ndata.password !== undefined) {
+      this.currPassword = ndata.password
+    }
     const res = await fetch(`${this.loc}/api/user/${userid}/detail`, {
       method: 'POST',
       headers: {
-        Authorization: this.session
+        Authorization: this.session,
+        'content-type': 'application/json;charset=utf-8'
       },
       body: JSON.stringify(ndata)
     })
@@ -475,12 +489,15 @@ class NetWork {
    * @param {number} userid 用户id
    */
   async AddWatchList (watchData, userid = this.currUserId) {
+    console.log(watchData)
+    console.log(JSON.stringify(watchData))
     const res = await fetch(`${this.loc}/api/user/${userid}/watchlist`, {
       method: 'POST',
       headers: {
-        Authorization: this.session
+        Authorization: this.session,
+        'content-type': 'application/json;charset=utf-8'
       },
-      data: JSON.stringify(watchData)
+      body: JSON.stringify({ watchList: watchData })
     })
     const resStatus = await res.status
     const resJson = await res.json()
@@ -501,9 +518,10 @@ class NetWork {
     const res = await fetch(`${this.loc}/api/user/${userid}/watchlist`, {
       method: 'DELETE',
       headers: {
-        Authorization: this.session
+        Authorization: this.session,
+        'content-type': 'application/json;charset=utf-8'
       },
-      data: JSON.stringify(watchData)
+      body: JSON.stringify({ watchList: watchData })
     })
     const resStatus = await res.status
     const resJson = await res.json()
