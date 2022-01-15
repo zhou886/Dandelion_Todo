@@ -16,8 +16,12 @@ class TimeStamp {
     return this.timeDateObj
   }
 
-  SetTime () {
-    return this.timeDateObj
+  SetTime (date) {
+    if (date instanceof Date) {
+      this.timeDateObj = date
+    } else if (typeof date === 'number') {
+      this.timeDateObj = new DataTransfer(date)
+    }
   }
 }
 
@@ -27,7 +31,7 @@ class TodoEntity {
       EntityJson.completeAt === undefined ? 0 : EntityJson.completeAt
     )
     this.createAt = new TimeStamp(
-      EntityJson.createAt === undefined ? 0 : EntityJson.createAt
+      EntityJson.createAt === undefined ? Date() : EntityJson.createAt
     )
     this.creatorId = EntityJson.creatorId
     this.deadline = new TimeStamp(
@@ -48,6 +52,43 @@ class TodoEntity {
     this.updateAt = new TimeStamp(
       EntityJson.updateAt === undefined ? 0 : EntityJson.updateAt
     )
+  }
+
+  /**
+   * 更新当前todo的完成时间
+   */
+  completeTodo () {
+    this.completeAt.SetTime(new Date())
+    this.updateAt.SetTime(new Date())
+  }
+
+  /**
+   * 更新当前的todo时间
+   */
+  updateTodo () {
+    this.updateAt.SetTime(new Date())
+  }
+
+  /**
+   * 增加种树时间，要求传入time是number
+   * @param {number} time 种树时长
+   */
+  plantForTime (time) {
+    if (typeof time === 'number') {
+      this.plantTime += time
+      this.updateAt.SetTime(new Date())
+    }
+  }
+
+  /**
+   * 更新Deadline
+   * @param {Date} timeDate deadline的时间，要求是Date类型
+   */
+  updateDeadline (timeDate) {
+    if (timeDate instanceof Date) {
+      this.deadline.SetTime(timeDate)
+      this.updateAt.SetTime(new Date())
+    }
   }
 
   parseJson () {
