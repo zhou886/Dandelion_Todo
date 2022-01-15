@@ -220,6 +220,7 @@
 </style>
 
 <script>
+import Network from '../network/index'
 export default {
   data () {
     return {
@@ -311,6 +312,8 @@ export default {
     todoList () {
       // 向拉取TODOList的数据
       // 然后用this.$store.commit('addTodoEntity', todoEntity)加到vuex里面
+      const nt = new Network('http://sgp.hareru.moe:8080')
+      console.log(nt)
       const tmpList = this.$store.state.undoneRepository.todoList
       function compareTitle (x, y) {
         if (x.title < y.title) { return -1 } else { return 1 }

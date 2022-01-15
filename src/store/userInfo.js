@@ -8,8 +8,14 @@ export default {
     token: ''
   },
   mutations: {
-    getUserInfo (state, currentUserInfo) {
-      state.userInfo = currentUserInfo
+    setId (state, _id) {
+      state.userInfo.id = _id
+    },
+    setNickname (state, _nickname) {
+      state.userInfo.nickname = _nickname
+    },
+    setRole (state, _role) {
+      state.userInfo.role = _role
     },
     changeNickname (state, newNickname) {
       state.userInfo.nickname = newNickname

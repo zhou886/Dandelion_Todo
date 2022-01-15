@@ -521,3 +521,5 @@ class NetWork {
   }
 }
 module.exports = NetWork
+
+// http://sgp.hareru.moe:8080

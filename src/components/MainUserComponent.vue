@@ -60,7 +60,7 @@
                   remote
                   reserve-keyword
                   placeholder="请选择用户"
-                  :remote-method="remoteMethod(input)"
+                  :remote-method="remoteMethod"
                   :loading="loading"
                 >
                   <el-option
@@ -242,7 +242,7 @@
 export default {
   data () {
     return {
-      input: '',
+      input: [],
       loading: false,
       options: [],
       visible: false
@@ -274,8 +274,7 @@ export default {
       this.$store.commit('removeWatched', user)
     },
     remoteMethod (query) {
-      console.log('1')
-      if (query) {
+      if (query !== '') {
         this.loading = true
         // 向服务器发送请求，获取所有昵称中带有关键词query的用户
         // 把用户ID、头像?拉取到this.options
@@ -293,7 +292,10 @@ export default {
         this.options = []
       }
     },
-    btnAddWatchClick () {}
+    btnAddWatchClick () {
+      this.visible = false
+      // 向服务器发送请求
+    }
   }
 }
 </script>

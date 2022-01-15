@@ -147,6 +147,7 @@ span {
 </style>
 
 <script>
+import Network from '../network/index'
 export default {
   data () {
     return {
@@ -160,26 +161,46 @@ export default {
   },
   methods: {
     btnLoginClick () {
-      if (this.userId && this.userPassword) {
-        // 向服务器发送userId和uesrPassword，返回token保存在vuex中
-        // 使用this.$store.commit('setToken', token)
-
-        // 如果登录失败
+      console.log(this.$store)
+      console.log(this.$router)
+      if (!this.userId) {
         this.$message({
-          message: '登录失败，请检查ID与密码是否正确',
+          message: '用户ID不能为空',
           iconClass: 'el-icon-warning-outline',
           duration: 1500,
           center: true
         })
-        // 如果登录成功
-        this.$router.push({ name: 'undone' })
+      } else if (!this.userPassword) {
+        this.$message({
+          message: '用户密码不能为空',
+          iconClass: 'el-icon-warning-outline',
+          duration: 1500,
+          center: true
+        })
       } else {
-        this.$message({
-          message: '用户ID或密码不能为空',
-          iconClass: 'el-icon-warning-outline',
-          duration: 1500,
-          center: true
-        })
+        const nt = new Network('http://sgp.hareru.moe:8080')
+        nt.Login(this.userId, this.userPassword)
+          .then(() => {
+            // 如果登录成功
+            nt.QueryDetailInfo(this.userId)
+              .then((userEntity) => {
+                this.$store.commit('setId', userEntity.userId)
+                this.$store.commit('setNickname', userEntity.nickname)
+                this.$store.commit('setRole', userEntity.role)
+              })
+            this.$router.push({ name: 'undone' })
+          })
+          .catch((error) => {
+            // 如果登录失败
+            this.$message({
+              message: error,
+              iconClass: 'el-icon-warning-outline',
+              duration: 1500,
+              center: true
+            })
+            this.userId = null
+            this.userPassword = null
+          })
       }
     },
     btnRegisterClick () {
@@ -214,25 +235,29 @@ export default {
           })
         } else {
           // 向服务器发送昵称和密码的注册信息，返回用户Id
-
-          // 注册失败
-          this.$message({
-            message: '注册失败，请稍后再试',
-            iconClass: 'el-icon-warning-outline',
-            duration: 1500,
-            center: true
-          })
-
-          // 注册成功，返回用户ID
-          const id = 114514 // 暂时保存用户ID
-          this.$message({
-            message: '注册成功，您的用户ID是' + id,
-            iconClass: 'el-icon-warning-outline',
-            duration: 1500,
-            center: true
-          })
-          this.userId = id
-          this.registerDialogVisible = false
+          const nt = new Network('http://sgp.hareru.moe:8080')
+          nt.Register(this.registerNickname, this.registerPassword)
+            .then((userEntity) => {
+              // 注册成功，返回用户ID
+              const id = userEntity.userId // 暂时保存用户ID
+              this.$message({
+                message: '注册成功，您的用户ID是' + id,
+                iconClass: 'el-icon-warning-outline',
+                duration: 1500,
+                center: true
+              })
+              this.userId = id
+              this.registerDialogVisible = false
+            })
+            .catch((error) => {
+              // 注册失败
+              this.$message({
+                message: error,
+                iconClass: 'el-icon-warning-outline',
+                duration: 1500,
+                center: true
+              })
+            })
         }
       }
     },
