@@ -9,7 +9,7 @@ class TimeStamp {
   }
 
   GetTimeStampJson () {
-    return this.timeDateObj.getTime()
+    return this.timeDateObj.getTime() / 1000
   }
 
   GetTime () {
@@ -28,14 +28,14 @@ class TimeStamp {
 class TodoEntity {
   constructor (EntityJson) {
     this.completeAt = new TimeStamp(
-      EntityJson.completeAt === undefined ? 0 : EntityJson.completeAt
+      EntityJson.completeAt === undefined ? 0 : EntityJson.completeAt * 1000
     )
     this.createAt = new TimeStamp(
-      EntityJson.createAt === undefined ? Date() : EntityJson.createAt
+      EntityJson.createAt === undefined ? Date() : EntityJson.createAt * 1000
     )
     this.creatorId = EntityJson.creatorId
     this.deadline = new TimeStamp(
-      EntityJson.deadline === undefined ? 0 : EntityJson.deadline
+      EntityJson.deadline === undefined ? 0 : EntityJson.deadline * 1000
     )
 
     if (EntityJson.description) {
@@ -50,7 +50,7 @@ class TodoEntity {
     this.title = EntityJson.title
     this.todoId = EntityJson.todoId
     this.updateAt = new TimeStamp(
-      EntityJson.updateAt === undefined ? 0 : EntityJson.updateAt
+      EntityJson.updateAt === undefined ? 0 : EntityJson.updateAt * 1000
     )
   }
 
