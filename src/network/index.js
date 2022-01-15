@@ -4,15 +4,18 @@ const { UserEntity, TodoEntity } = require('../model')
 
 class NetWork {
   constructor (loc) {
-    if (!this.instance) {
-      this.instance = this
-    }
     this.loc = loc
     this.session = ''
     this.currUserId = 0
     this.currPassword = ''
     this.currNickname = ''
-    return this.instance
+  }
+
+  static getInstance () {
+    if (!NetWork.instance) {
+      NetWork.instance = new NetWork('http://sgp.hareru.moe:8080')
+    }
+    return NetWork.instance
   }
   /**
    * 登录函数
@@ -163,6 +166,8 @@ class NetWork {
    * @param {number} userid 用户id
    */
   async CreateTODO (todoItem, userid = this.currUserId) {
+    console.log(JSON.stringify(todoItem.parseJson()))
+    console.log(this.currUserId, this.currPassword)
     const res = await fetch(`${this.loc}/api/todo/${userid}/new`, {
       method: 'POST',
       headers: {

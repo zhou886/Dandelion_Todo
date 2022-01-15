@@ -230,7 +230,7 @@
 
 <script>
 import Network from '../network/index'
-import { TodoEntity, TimeStamp } from '../model/index'
+import { TodoEntity } from '../model/index'
 export default {
   data () {
     return {
@@ -265,11 +265,21 @@ export default {
 
       // 判空
       if (!todoTitle) {
-        alert('TODO标题不能为空!')
+        this.$message({
+          message: 'TODO标题不能为空!',
+          iconClass: 'el-icon-warning-outline',
+          duration: 1500,
+          center: true
+        })
         return
       }
       if (!todoDeadline) {
-        alert('TODO截止时间不能为空!')
+        this.$message({
+          message: 'TODO截止时间不能为空!',
+          iconClass: 'el-icon-warning-outline',
+          duration: 1500,
+          center: true
+        })
         return
       }
 
@@ -278,13 +288,14 @@ export default {
       const todoEntity = new TodoEntity({
         title: todoTitle,
         description: todoDescription,
-        deadline: new TimeStamp(todoDeadline),
-        createAt: new TimeStamp(currentTime),
+        deadline: todoDeadline,
+        createAt: currentTime,
         todoId: this.$store.state.userInfo.todoCount,
+        parentId: 0,
         creatorId: this.$store.state.userInfo.userInfo.id
       })
 
-      const nt = new Network('http://sgp.hareru.moe:8080')
+      const nt = Network.getInstance()
       nt.CreateTODO(todoEntity, this.$store.state.userInfo.userInfo.id)
         .then(() => {
           // 服务器返回创建TODO成功，本地同步更新
@@ -311,7 +322,7 @@ export default {
       const newTodoEntity = todoEntity
       newTodoEntity.completeAt = new Date()
 
-      const nt = new Network('http://sgp.hareru.moe:8080')
+      const nt = Network.getInstance()
       nt.UpdateTODO(
         newTodoEntity,
         todoEntity.todoId,
@@ -328,7 +339,7 @@ export default {
         })
     },
     deleteButtonClick (todoEntity) {
-      const nt = new Network('http://sgp.hareru.moe:8080')
+      const nt = Network.getInstance()
       nt.DeleteTODO(todoEntity.todoId, this.$store.state.userInfo.userInfo.id)
         .then(() => {
           // 服务器返回删除TODO成功，本地同步更新

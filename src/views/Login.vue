@@ -178,7 +178,7 @@ export default {
           center: true
         })
       } else {
-        const nt = new Network('http://sgp.hareru.moe:8080')
+        const nt = Network.getInstance()
         nt.Login(this.userId, this.userPassword)
           .then(() => {
             // 如果登录成功
@@ -270,7 +270,7 @@ export default {
           })
         } else {
           // 向服务器发送昵称和密码的注册信息，返回用户Id
-          const nt = new Network('http://sgp.hareru.moe:8080')
+          const nt = Network.getInstance()
           nt.Register(this.registerNickname, this.registerPassword)
             .then((userEntity) => {
               // 注册成功，返回用户ID

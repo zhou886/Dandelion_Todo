@@ -23,18 +23,31 @@ class TimeStamp {
 
 class TodoEntity {
   constructor (EntityJson) {
-    this.completeAt = new TimeStamp(EntityJson.completeAt === undefined ? 0 : EntityJson.completeAt)
-    this.createAt = new TimeStamp(EntityJson.createAt === undefined ? 0 : EntityJson.createAt)
+    this.completeAt = new TimeStamp(
+      EntityJson.completeAt === undefined ? 0 : EntityJson.completeAt
+    )
+    this.createAt = new TimeStamp(
+      EntityJson.createAt === undefined ? 0 : EntityJson.createAt
+    )
     this.creatorId = EntityJson.creatorId
-    this.deadline = new TimeStamp(EntityJson.deadline === undefined ? 0 : EntityJson.deadline)
-    this.description = EntityJson.description
+    this.deadline = new TimeStamp(
+      EntityJson.deadline === undefined ? 0 : EntityJson.deadline
+    )
+
+    if (EntityJson.description) {
+      this.description = EntityJson.description
+    } else {
+      this.description = ''
+    }
     this.importance = EntityJson.importance
     this.localId = EntityJson.localId
     this.parentId = EntityJson.parentId
     this.plantTime = EntityJson.plantTime
     this.title = EntityJson.title
     this.todoId = EntityJson.todoId
-    this.updateAt = new TimeStamp(EntityJson.updateAt === undefined ? 0 : EntityJson.updateAt)
+    this.updateAt = new TimeStamp(
+      EntityJson.updateAt === undefined ? 0 : EntityJson.updateAt
+    )
   }
 
   parseJson () {
