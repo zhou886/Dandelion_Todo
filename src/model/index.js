@@ -9,7 +9,7 @@ class TimeStamp {
   }
 
   GetTimeStampJson () {
-    return this.timeDateObj.getTime() / 1000
+    return parseInt(this.timeDateObj.getTime() / 1000)
   }
 
   GetTime () {
