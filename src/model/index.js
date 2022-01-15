@@ -35,6 +35,22 @@ class TodoEntity {
     this.todoId = EntityJson.todoId
     this.updateAt = EntityJson.updateAt
   }
+
+  parseJson () {
+    return {
+      completeAt: this.completeAt,
+      createAt: this.createAt,
+      creatorId: this.creatorId,
+      deadline: this.deadline,
+      description: this.description,
+      localId: this.localId,
+      parentId: this.parentId,
+      plantTime: this.plantTime,
+      title: this.title,
+      todoId: this.todoId,
+      updateAt: this.updateAt
+    }
+  }
 }
 
 class UserEntity {
@@ -44,6 +60,14 @@ class UserEntity {
     this.role = EntityJson.role
     this.userId = EntityJson.userId
     this.watchList = EntityJson.watchList
+  }
+
+  parseJson () {
+    return {
+      nickname: this.nickname,
+      password: this.password,
+      userId: this.userId
+    }
   }
 }
 
