@@ -166,8 +166,6 @@ class NetWork {
    * @param {number} userid 用户id
    */
   async CreateTODO (todoItem, userid = this.currUserId) {
-    console.log(JSON.stringify(todoItem.parseJson()))
-    console.log(this.currUserId, this.currPassword)
     const res = await fetch(`${this.loc}/api/todo/${userid}/new`, {
       method: 'POST',
       headers: {
@@ -179,6 +177,10 @@ class NetWork {
     const resStatus = await res.status
     const resJson = await res.json()
     if (resJson.status === 200 && resStatus === 200) {
+      resJson.data.completeAt *= 1000
+      resJson.data.createAt *= 1000
+      resJson.data.deadline *= 1000
+      resJson.data.updateAt *= 1000
       return new TodoEntity(resJson.data)
     } else if (resJson != null) {
       if (resJson.status === 403) {
@@ -208,6 +210,10 @@ class NetWork {
     const resStatus = await res.status
     const resJson = await res.json()
     if (resJson.status === 200 && resStatus === 200) {
+      resJson.data.completeAt *= 1000
+      resJson.data.createAt *= 1000
+      resJson.data.deadline *= 1000
+      resJson.data.updateAt *= 1000
       return new TodoEntity(resJson.data)
     } else if (resJson != null) {
       if (resJson.status === 403) {

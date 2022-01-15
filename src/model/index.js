@@ -20,7 +20,7 @@ class TimeStamp {
     if (date instanceof Date) {
       this.timeDateObj = date
     } else if (typeof date === 'number') {
-      this.timeDateObj = new DataTransfer(date)
+      this.timeDateObj = new Date(date)
     }
   }
 }
@@ -28,14 +28,14 @@ class TimeStamp {
 class TodoEntity {
   constructor (EntityJson) {
     this.completeAt = new TimeStamp(
-      EntityJson.completeAt === undefined ? 0 : EntityJson.completeAt * 1000
+      EntityJson.completeAt === undefined ? 0 : EntityJson.completeAt
     )
     this.createAt = new TimeStamp(
-      EntityJson.createAt === undefined ? Date() : EntityJson.createAt * 1000
+      EntityJson.createAt === undefined ? Date() : EntityJson.createAt
     )
     this.creatorId = EntityJson.creatorId
     this.deadline = new TimeStamp(
-      EntityJson.deadline === undefined ? 0 : EntityJson.deadline * 1000
+      EntityJson.deadline === undefined ? 0 : EntityJson.deadline
     )
 
     if (EntityJson.description) {
@@ -50,7 +50,7 @@ class TodoEntity {
     this.title = EntityJson.title
     this.todoId = EntityJson.todoId
     this.updateAt = new TimeStamp(
-      EntityJson.updateAt === undefined ? 0 : EntityJson.updateAt * 1000
+      EntityJson.updateAt === undefined ? 0 : EntityJson.updateAt
     )
   }
 
