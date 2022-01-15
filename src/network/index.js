@@ -86,6 +86,12 @@ class NetWork {
     if (resJson.status === 200 && resStatus === 200) {
       const resData = JSON.parse(resJson.data)
       const res = []
+      resData.forEach(e => {
+        e.completeAt *= 1000
+        e.createAt *= 1000
+        e.deadline *= 1000
+        e.updateAt *= 1000
+      })
       resData.forEach(e => res.push(new TodoEntity(e)))
       return res
     } else if (resJson != null) {
@@ -117,6 +123,12 @@ class NetWork {
     if (resJson.status === 200 && resStatus === 200) {
       const resData = resJson.data
       const res = []
+      resData.forEach(e => {
+        e.completeAt *= 1000
+        e.createAt *= 1000
+        e.deadline *= 1000
+        e.updateAt *= 1000
+      })
       resData.forEach(e => res.push(new TodoEntity(e)))
       return res
     } else if (resJson != null) {
