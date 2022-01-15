@@ -3,10 +3,7 @@
     <el-container>
       <el-header>
         <div class="addTodoArea">
-          <el-row
-            type="flex"
-            justify="end"
-            align="middle">
+          <el-row type="flex" justify="end" align="middle">
             <el-col :span="8" :xs="8">
               <el-input
                 v-model="search"
@@ -17,9 +14,20 @@
             </el-col>
             <el-col :span="16" :xs="16" class="colAlignRight">
               <el-dropdown style="float: right" @command="handleCommand">
-                <el-button icon="el-icon-sort" type="primary" round class="btnSort"></el-button>
+                <el-button
+                  icon="el-icon-sort"
+                  type="primary"
+                  round
+                  class="btnSort"
+                ></el-button>
                 <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item v-for="item in sortOption" :key="item.value" :command="item.value">{{item.label}}</el-dropdown-item>
+                  <el-dropdown-item
+                    v-for="item in sortOption"
+                    :key="item.value"
+                    :command="item.value"
+                  >
+                    {{ item.label }}
+                  </el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
               <el-button
@@ -54,7 +62,7 @@
                   <el-date-picker
                     v-model="todoDeadline"
                     type="datetime"
-                    placeholder="选择截止时间"
+                    placeholder="请选择截止时间"
                     align="center"
                     style="width: 100%; margin-left: 5px"
                   ></el-date-picker>
@@ -69,7 +77,9 @@
                   </el-button>
                   <el-button
                     type="primary"
-                    @click="createTodoEntity(todoTitle, todoDescription, todoDeadline)"
+                    @click="
+                      createTodoEntity(todoTitle, todoDescription, todoDeadline)
+                    "
                     round
                     class="btnAddTodoDialog"
                   >
@@ -136,7 +146,6 @@
 </template>
 
 <style lang="scss" scoped>
-
 .btnSort,
 .btnAdd {
   float: right;
@@ -221,15 +230,16 @@
 
 <script>
 import Network from '../network/index'
+import { TodoEntity, TimeStamp } from '../model/index'
 export default {
   data () {
     return {
-      search: '',
+      search: null,
       dialogVisible: false,
-      todoTitle: '',
-      todoDescription: '',
-      todoDeadline: '',
-      sortSelect: '',
+      todoTitle: null,
+      todoDescription: null,
+      todoDeadline: null,
+      sortSelect: null,
       sortOption: [
         {
           value: 1,
@@ -251,7 +261,9 @@ export default {
       done()
     },
     createTodoEntity (todoTitle, todoDescription, todoDeadline) {
-      // 创建TODO，向服务发送创建TODO请求
+      // 新建TODO
+
+      // 判空
       if (!todoTitle) {
         alert('TODO标题不能为空!')
         return
@@ -260,49 +272,78 @@ export default {
         alert('TODO截止时间不能为空!')
         return
       }
-      const d = todoDeadline
-      const year = d.getFullYear().toString()
-      const month = (d.getMonth() + 1).toString()
-      const day = d.getDate().toString()
-      const hour = d.getHours().toString()
-      var minite = ''
-      if (d.getMinutes() < 10) {
-        minite = '0' + d.getMinutes().toString()
-      } else {
-        minite = d.getMinutes().toString()
-      }
-      const time = year + '-' + month + '-' + day + '-' + hour + '-' + minite
-      const todoEntity = {
+
+      // 构造新的todoEntity
+      const currentTime = new Date()
+      const todoEntity = new TodoEntity({
         title: todoTitle,
         description: todoDescription,
-        deadline: time
-      }
-      this.$store.commit('addTodoEntity', todoEntity)
-      this.todoTitle = ''
-      this.todoDescription = ''
-      this.todoDeadline = ''
+        deadline: new TimeStamp(todoDeadline),
+        createAt: new TimeStamp(currentTime),
+        todoId: this.$store.state.userInfo.todoCount,
+        creatorId: this.$store.state.userInfo.userInfo.id
+      })
+
+      const nt = new Network('http://sgp.hareru.moe:8080')
+      nt.CreateTODO(todoEntity, this.$store.state.userInfo.userInfo.id)
+        .then(() => {
+          // 服务器返回创建TODO成功，本地同步更新
+          this.$store.commit('addTodoCount')
+          this.$store.commit('addUndoneEntity', todoEntity)
+        })
+        .catch((error) => {
+          // 服务器返回创建TODO失败，弹窗告知错误
+          console.log(error)
+          this.$message({
+            message: error,
+            iconClass: 'el-icon-warning-outline',
+            duration: 1500,
+            center: true
+          })
+        })
+      this.todoTitle = null
+      this.todoDescription = null
+      this.todoDeadline = null
       this.dialogVisible = false
     },
     finishButtonClick (todoEntity) {
-      // 完成TODO，向服务器发送完成TODO请求
-      const d = new Date()
-      const year = d.getFullYear().toString()
-      const month = (d.getMonth() + 1).toString()
-      const day = d.getDate().toString()
-      const hour = d.getHours().toString()
-      var minite = ''
-      if (d.getMinutes() < 10) {
-        minite = '0' + d.getMinutes().toString()
-      } else {
-        minite = d.getMinutes().toString()
-      }
-      const time = year + '-' + month + '-' + day + '-' + hour + '-' + minite
-      todoEntity.completeAt = time
-      this.$store.commit('addDoneEntity', todoEntity)
-      this.$store.commit('removeTodoEntity', todoEntity)
+      // 完成TODO
+      const newTodoEntity = todoEntity
+      newTodoEntity.completeAt = new Date()
+
+      const nt = new Network('http://sgp.hareru.moe:8080')
+      nt.UpdateTODO(
+        newTodoEntity,
+        todoEntity.todoId,
+        this.$store.state.userInfo.userInfo.id
+      )
+        .then(() => {
+          // 服务器返回完成TODO成功，本地同步更新
+          this.$store.commit('addDoneEntity', newTodoEntity)
+          this.$store.commit('removeTodoEntity', todoEntity)
+        })
+        .catch((error) => {
+          // 服务器返回完成TODO失败，弹窗告知错误
+          console.log(error)
+        })
     },
     deleteButtonClick (todoEntity) {
-      this.$store.commit('removeTodoEntity', todoEntity)
+      const nt = new Network('http://sgp.hareru.moe:8080')
+      nt.DeleteTODO(todoEntity.todoId, this.$store.state.userInfo.userInfo.id)
+        .then(() => {
+          // 服务器返回删除TODO成功，本地同步更新
+          this.$store.commit('removeTodoEntity', todoEntity)
+        })
+        .catch((error) => {
+          // 服务器返回删除TODO失败，弹窗告知错误
+          console.log(error)
+          this.$message({
+            message: error,
+            iconClass: 'el-icon-warning-outline',
+            duration: 1500,
+            center: true
+          })
+        })
     },
     handleCommand (command) {
       this.sortSelect = command
@@ -310,20 +351,33 @@ export default {
   },
   computed: {
     todoList () {
-      // 向拉取TODOList的数据
-      // 然后用this.$store.commit('addTodoEntity', todoEntity)加到vuex里面
-      const nt = new Network('http://sgp.hareru.moe:8080')
-      console.log(nt)
+      // 已经在登录界面中获取了todoList
       const tmpList = this.$store.state.undoneRepository.todoList
+
+      // 创建排序用的函数原型
       function compareTitle (x, y) {
-        if (x.title < y.title) { return -1 } else { return 1 }
+        if (x.title < y.title) {
+          return -1
+        } else {
+          return 1
+        }
       }
       function compareCreateAt (x, y) {
-        if (x.createAt < y.createAt) { return -1 } else { return 1 }
+        if (x.createAt < y.createAt) {
+          return -1
+        } else {
+          return 1
+        }
       }
       function compareDeadline (x, y) {
-        if (x.deadline < y.deadline) { return -1 } else { return 1 }
+        if (x.deadline < y.deadline) {
+          return -1
+        } else {
+          return 1
+        }
       }
+
+      // 根据选择的不同类型的排序方式进行排序
       if (this.sortSelect) {
         switch (this.sortSelect) {
           case 1:
@@ -337,6 +391,8 @@ export default {
             break
         }
       }
+
+      // 根据输入的搜索title的关键词对tmpList进行选择
       if (this.search) {
         return tmpList.filter((item) => {
           return item.title.includes(this.search)
@@ -347,11 +403,21 @@ export default {
     },
     dialogWidth () {
       const tmp = document.body.clientWidth
-      if (tmp < 800) { return '100%' } else if (tmp < 1024) { return '75%' } else { return '50%' }
+      if (tmp < 800) {
+        return '100%'
+      } else if (tmp < 1024) {
+        return '75%'
+      } else {
+        return '50%'
+      }
     },
     elInputPlaceholder () {
       const tmp = document.body.clientWidth
-      if (tmp < 800) { return '' } else { return '请输入要查找的标题关键词' }
+      if (tmp < 800) {
+        return ''
+      } else {
+        return '请输入要查找的标题关键词'
+      }
     }
   }
 }

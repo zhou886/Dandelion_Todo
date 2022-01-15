@@ -182,12 +182,47 @@ export default {
         nt.Login(this.userId, this.userPassword)
           .then(() => {
             // 如果登录成功
+
+            // 获取用户信息并保存在Vuex中
             nt.QueryDetailInfo(this.userId)
               .then((userEntity) => {
                 this.$store.commit('setId', userEntity.userId)
                 this.$store.commit('setNickname', userEntity.nickname)
                 this.$store.commit('setRole', userEntity.role)
               })
+              .catch((error) => {
+                console.log(error)
+                this.$message({
+                  message: '获取用户信息失败',
+                  iconClass: 'el-icon-warning-outline',
+                  duration: 1500,
+                  center: true
+                })
+              })
+
+            // 获取用户TodoList并分类放在Vuex中
+            nt.GetTodoList(this.userId)
+              .then((todoList) => {
+                this.$store.commit('setTodoCount', todoList.length)
+                for (var i = 0; i < todoList.length; i++) {
+                  if (todoList[i].completeAt === 0) {
+                    this.$store.commit('addUndoneEntity', todoList[i])
+                  } else {
+                    this.$store.commit('addDoneEntity', todoList[i])
+                  }
+                }
+              })
+              .catch((error) => {
+                console.log(error)
+                this.$message({
+                  message: '获取用户TodoList失败',
+                  iconClass: 'el-icon-warning-outline',
+                  duration: 1500,
+                  center: true
+                })
+              })
+
+            // 跳转到MainUndoneComponent
             this.$router.push({ name: 'undone' })
           })
           .catch((error) => {

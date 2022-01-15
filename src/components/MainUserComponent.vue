@@ -12,6 +12,12 @@
                 <el-button plain round class="btnChangeAvator">
                   更改头像
                 </el-button>
+                <el-button plain round class="btnChangePassword">
+                  更改密码
+                </el-button>
+                <el-button plain round class="btnChangeNickname">
+                  更改昵称
+                </el-button>
               </el-col>
             </el-row>
           </div>

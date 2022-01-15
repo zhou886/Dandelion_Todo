@@ -155,6 +155,8 @@ p {
 </style>
 
 <script>
+import Network from '../network/index'
+
 export default {
   data () {
     return {
@@ -182,7 +184,23 @@ export default {
   },
   methods: {
     deleteButtonClick (item) {
-      this.$store.commit('removeDoneEntity', item)
+      // 删除已完成的TODO
+      const nt = new Network('http://sgp.hareru.moe:8080')
+      nt.DeleteTODO(item.todoId, this.$store.state.userInfo.userInfo.id)
+        .then(() => {
+          // 服务器返回删除TODO成功，更新本地数据
+          this.$store.commit('removeDoneEntity', item)
+        })
+        .catch((e) => {
+          // 服务器返回删除TODO失败，弹窗告知错误
+          console.log(e)
+          this.$message({
+            message: e,
+            iconClass: 'el-icon-warning-outline',
+            duration: 1500,
+            center: true
+          })
+        })
     },
     handleCommand (command) {
       this.sortSelect = command
@@ -190,8 +208,7 @@ export default {
   },
   computed: {
     doneList () {
-      // 向拉取doneList的数据
-      // 然后用this.$store.commit('addDoneEntity, doneEntity')加到vuex里面
+      // 从Vuex中获取已完成TODO列表
       const tmpList = this.$store.state.doneRepository.doneList
       function compareTitle (x, y) {
         if (x.title < y.title) {
@@ -221,6 +238,8 @@ export default {
           return 1
         }
       }
+
+      // 如果有要求排序就排序
       if (this.sortSelect) {
         switch (this.sortSelect) {
           case 1:
@@ -237,6 +256,8 @@ export default {
             break
         }
       }
+
+      // 如果有要求搜索就搜索
       if (this.search) {
         return tmpList.filter((item) => {
           return item.title.includes(this.search)

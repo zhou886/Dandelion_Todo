@@ -1,11 +1,11 @@
 export default {
   state: {
     userInfo: {
-      id: 114514,
-      nickname: 'hhm',
-      role: '普通角色'
+      id: null,
+      nickname: null,
+      role: null
     },
-    token: ''
+    todoCount: null
   },
   mutations: {
     setId (state, _id) {
@@ -17,11 +17,14 @@ export default {
     setRole (state, _role) {
       state.userInfo.role = _role
     },
-    changeNickname (state, newNickname) {
-      state.userInfo.nickname = newNickname
+    changeNickname (state, _nickname) {
+      state.userInfo.nickname = _nickname
     },
-    setToken (state, _token) {
-      state.token = _token
+    setTodoCount (state, _todoCount) {
+      state.todoCount = _todoCount
+    },
+    addTodoCount (state) {
+      state.todoCount++
     }
   }
 }

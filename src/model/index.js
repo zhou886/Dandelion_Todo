@@ -3,7 +3,7 @@ class TimeStamp {
   constructor (timeObj) {
     if (timeObj instanceof Date) {
       this.timeDateObj = timeObj
-    } else if (typeof (timeObj) === 'number') {
+    } else if (typeof timeObj === 'number') {
       this.timeDateObj = new Date(timeObj)
     }
   }
@@ -23,10 +23,10 @@ class TimeStamp {
 
 class TodoEntity {
   constructor (EntityJson) {
-    this.completeAt = new TimeStamp(EntityJson.completeAt)
-    this.createAt = new TimeStamp(EntityJson.createAt)
+    this.completeAt = new TimeStamp(EntityJson.completeAt === undefined ? 0 : EntityJson.completeAt)
+    this.createAt = new TimeStamp(EntityJson.createAt === undefined ? 0 : EntityJson.createAt)
     this.creatorId = EntityJson.creatorId
-    this.deadline = new TimeStamp(EntityJson.deadline)
+    this.deadline = new TimeStamp(EntityJson.deadline === undefined ? 0 : EntityJson.deadline)
     this.description = EntityJson.description
     this.importance = EntityJson.importance
     this.localId = EntityJson.localId
@@ -34,7 +34,7 @@ class TodoEntity {
     this.plantTime = EntityJson.plantTime
     this.title = EntityJson.title
     this.todoId = EntityJson.todoId
-    this.updateAt = new TimeStamp(EntityJson.updateAt)
+    this.updateAt = new TimeStamp(EntityJson.updateAt === undefined ? 0 : EntityJson.updateAt)
   }
 
   parseJson () {
