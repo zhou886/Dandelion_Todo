@@ -135,7 +135,7 @@
               </div>
               <div class="deadline">
                 <h3>截止时间</h3>
-                <p>{{ item.deadline }}</p>
+                <p>{{ dateFormat(item.deadline) }}</p>
               </div>
             </el-card>
           </el-col>
@@ -295,6 +295,7 @@ export default {
         creatorId: this.$store.state.userInfo.userInfo.id
       })
 
+      console.log(todoEntity)
       const nt = Network.getInstance()
       nt.CreateTODO(todoEntity, this.$store.state.userInfo.userInfo.id)
         .then(() => {
@@ -320,7 +321,7 @@ export default {
     finishButtonClick (todoEntity) {
       // 完成TODO
       const newTodoEntity = todoEntity
-      newTodoEntity.completeAt = new Date()
+      newTodoEntity.completeTodo()
 
       const nt = Network.getInstance()
       nt.UpdateTODO(
@@ -331,7 +332,7 @@ export default {
         .then(() => {
           // 服务器返回完成TODO成功，本地同步更新
           this.$store.commit('addDoneEntity', newTodoEntity)
-          this.$store.commit('removeTodoEntity', todoEntity)
+          this.$store.commit('removeUndoneEntity', todoEntity)
         })
         .catch((error) => {
           // 服务器返回完成TODO失败，弹窗告知错误
@@ -343,7 +344,7 @@ export default {
       nt.DeleteTODO(todoEntity.todoId, this.$store.state.userInfo.userInfo.id)
         .then(() => {
           // 服务器返回删除TODO成功，本地同步更新
-          this.$store.commit('removeTodoEntity', todoEntity)
+          this.$store.commit('removeUndoneEntity', todoEntity)
         })
         .catch((error) => {
           // 服务器返回删除TODO失败，弹窗告知错误
@@ -358,12 +359,17 @@ export default {
     },
     handleCommand (command) {
       this.sortSelect = command
+      console.log(this.sortSelect)
+    },
+    dateFormat (date) {
+      return date.GetTime().toLocaleString()
     }
   },
   computed: {
     todoList () {
       // 已经在登录界面中获取了todoList
       const tmpList = this.$store.state.undoneRepository.todoList
+      console.log(tmpList)
 
       // 创建排序用的函数原型
       function compareTitle (x, y) {
@@ -374,14 +380,14 @@ export default {
         }
       }
       function compareCreateAt (x, y) {
-        if (x.createAt < y.createAt) {
+        if (x.createAt.GetTime() < y.createAt.GetTime()) {
           return -1
         } else {
           return 1
         }
       }
       function compareDeadline (x, y) {
-        if (x.deadline < y.deadline) {
+        if (x.deadline.GetTime() < y.deadline.GetTime()) {
           return -1
         } else {
           return 1

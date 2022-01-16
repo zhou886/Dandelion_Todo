@@ -54,7 +54,9 @@ export default {
     goToMainUser () {
       if (this.$route.name !== 'user') { this.$router.push({ name: 'user' }) }
     },
-    userExit () {}
+    userExit () {
+      this.$router.push({ path: '/' })
+    }
   }
 }
 </script>

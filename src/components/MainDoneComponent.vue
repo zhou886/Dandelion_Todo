@@ -69,11 +69,11 @@
             </div>
             <div class="deadline">
               <h3>截止时间</h3>
-              <p>{{ item.deadline }}</p>
+              <p>{{ dateFormat(item.deadline) }}</p>
             </div>
             <div class="completeAt">
               <h3>完成时间</h3>
-              <p>{{ item.completeAt }}</p>
+              <p>{{ dateFormat(item.completeAt) }}</p>
             </div>
           </el-card>
         </el-col>
@@ -155,7 +155,7 @@ p {
 </style>
 
 <script>
-import Network from '../network/index'
+import NetWork from '../network/index'
 
 export default {
   data () {
@@ -185,7 +185,7 @@ export default {
   methods: {
     deleteButtonClick (item) {
       // 删除已完成的TODO
-      const nt = new Network('http://sgp.hareru.moe:8080')
+      const nt = NetWork.getInstance()
       nt.DeleteTODO(item.todoId, this.$store.state.userInfo.userInfo.id)
         .then(() => {
           // 服务器返回删除TODO成功，更新本地数据
@@ -204,12 +204,16 @@ export default {
     },
     handleCommand (command) {
       this.sortSelect = command
+    },
+    dateFormat (date) {
+      return date.GetTime().toLocaleString()
     }
   },
   computed: {
     doneList () {
       // 从Vuex中获取已完成TODO列表
       const tmpList = this.$store.state.doneRepository.doneList
+      console.log(tmpList)
       function compareTitle (x, y) {
         if (x.title < y.title) {
           return -1
@@ -218,21 +222,21 @@ export default {
         }
       }
       function compareCreateAt (x, y) {
-        if (x.createAt < y.createAt) {
+        if (x.createAt.GetTime() < y.createAt.GetTime()) {
           return -1
         } else {
           return 1
         }
       }
       function compareDeadline (x, y) {
-        if (x.deadline < y.deadline) {
+        if (x.deadline.GetTime() < y.deadline.GetTime()) {
           return -1
         } else {
           return 1
         }
       }
       function compareCompleteAt (x, y) {
-        if (x.completeAt < y.completeAt) {
+        if (x.completeAt.GetTime() < y.completeAt.GetTime()) {
           return -1
         } else {
           return 1

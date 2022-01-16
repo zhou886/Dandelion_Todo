@@ -1,22 +1,20 @@
 export default {
   state: {
-    watchList: [
-      {
-        userId: 11,
-        nickname: 'zyx'
-      },
-      {
-        userId: 12,
-        nickname: 'hyp'
-      }
-    ]
+    watchList: []
   },
   mutations: {
     getWatchList (state, currentWatchList) {
       state.watchList = currentWatchList
     },
     addWatched (state, watched) {
-      state.push(watched)
+      let flag = false
+      for (var i = 0; i < state.watchList.length; i++) {
+        if (state.watchList[i] === watched) {
+          flag = true
+          break
+        }
+      }
+      if (flag === false) { state.watchList.push(watched) }
     },
     removeWatched (state, watched) {
       for (var i = 0; i < state.watchList.length; i++) {

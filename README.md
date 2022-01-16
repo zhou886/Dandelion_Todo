@@ -43,6 +43,12 @@
   完善MainUserComponent。
 
   添加前端与服务器通信部分代码。
+  
++ 1.16
+
+  完成MainUserComponent。
+
+  修理网络通信部分的Bug。
 
 ## 类图
 

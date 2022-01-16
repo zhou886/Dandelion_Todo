@@ -161,8 +161,6 @@ export default {
   },
   methods: {
     btnLoginClick () {
-      console.log(this.$store)
-      console.log(this.$router)
       if (!this.userId) {
         this.$message({
           message: '用户ID不能为空',
@@ -189,6 +187,7 @@ export default {
                 this.$store.commit('setId', userEntity.userId)
                 this.$store.commit('setNickname', userEntity.nickname)
                 this.$store.commit('setRole', userEntity.role)
+                this.$store.commit('setPassword', this.userPassword)
               })
               .catch((error) => {
                 console.log(error)
@@ -205,7 +204,7 @@ export default {
               .then((todoList) => {
                 this.$store.commit('setTodoCount', todoList.length)
                 for (var i = 0; i < todoList.length; i++) {
-                  if (todoList[i].completeAt === 0) {
+                  if (todoList[i].completeAt.GetTimeStampJson() === 0) {
                     this.$store.commit('addUndoneEntity', todoList[i])
                   } else {
                     this.$store.commit('addDoneEntity', todoList[i])
@@ -222,13 +221,47 @@ export default {
                 })
               })
 
+            // 获取用户WatchList并放入Vuex中
+            nt.GetWatchList(this.userId)
+              .then((userIdArray) => {
+                userIdArray.forEach(item => {
+                  nt.GetPublishedInfo(item)
+                    .then(res => {
+                      this.$store.commit('addWatched', res)
+                    })
+                    .catch(e => {
+                      console.log(e)
+                    })
+                })
+              })
+              .catch(e => {
+                console.log(e)
+                this.$message({
+                  message: e,
+                  iconClass: 'el-icon-warning-outline',
+                  duration: 1500,
+                  center: true
+                })
+              })
+
+            // 获取用户头像
+            nt.GetAvatar(this.userId)
+              .then((res) => {
+                console.log('avatar', res)
+                this.$store.commit('setAvatar', res)
+              })
+              .catch(e => {
+                console.log(e)
+              })
+
             // 跳转到MainUndoneComponent
             this.$router.push({ name: 'undone' })
           })
           .catch((error) => {
             // 如果登录失败
+            console.log(error)
             this.$message({
-              message: error,
+              message: '登录失败，请检查用户ID与密码是否正确',
               iconClass: 'el-icon-warning-outline',
               duration: 1500,
               center: true
