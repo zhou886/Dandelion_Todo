@@ -204,7 +204,7 @@ export default {
               .then((todoList) => {
                 this.$store.commit('setTodoCount', todoList.length)
                 for (var i = 0; i < todoList.length; i++) {
-                  if (todoList[i].completeAt.GetTimeStampJson() === 0) {
+                  if (todoList[i].completeAt.GetTime().getTime() === 0) {
                     this.$store.commit('addUndoneEntity', todoList[i])
                   } else {
                     this.$store.commit('addDoneEntity', todoList[i])

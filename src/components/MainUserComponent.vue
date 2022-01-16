@@ -224,11 +224,11 @@
         </div>
         <div class="clearfix">
           <el-row v-for="(item, index) in watchList" :key="index">
-            <el-card shadow="hover">
+            <el-card shadow="hover" v-for="(watchAvatarURLItem, index) in watchAvatarURL" :key="index">
               <div slot="header">
                 <el-row>
-                  <el-col :span="12">
-                    <el-image :src="'data:image/jpeg;base64,'+item.avatar" />
+                  <el-col :span="12" >
+                    <el-image :src="watchAvatarURLItem" fit="fill"></el-image>
                   </el-col>
                   <el-col :span="12">
                     <el-popconfirm
@@ -402,6 +402,7 @@ export default {
     return {
       selectUser: [],
       options: [],
+      watchAvatarURL: [],
       loading: false,
       popoverAddWatchVisible: false,
       dialogChangePasswordVisible: false,
@@ -433,13 +434,42 @@ export default {
     },
     userAvatar () {
       console.log(this.$store.state.userInfo.Avatar)
-      return this.$store.state.userInfo.Avatar
+      const blob = this.$store.state.userInfo.Avatar
+      if (blob.length === 0) { return '' } else {
+        const picURL = window.URL.createObjectURL(blob)
+        console.log('userAvatar', picURL)
+        return picURL
+      }
     },
     userInfo () {
       return this.$store.state.userInfo.userInfo
     }
   },
+  created () {
+    const watchList = this.$store.state.watchList.watchList
+    for (var i = 0; i < watchList.length; i++) {
+      const id = watchList[i].userId
+      this.getWatchAvatar(id)
+    }
+  },
   methods: {
+    getWatchAvatar (id) {
+      console.log('tryGetWatchAvatar', id)
+      const nt = NetWork.getInstance()
+      nt.GetAvatar(id)
+        .then((blob) => {
+          console.log('watchAvatar', blob)
+          if (blob.length === 0) { this.watchAvatarURL.push('') } else {
+            const watchAvatarURL = window.URL.createObjectURL(blob)
+            console.log('watchAvatar', watchAvatarURL)
+            this.watchAvatarURL.push(watchAvatarURL)
+          }
+        })
+        .catch(e => {
+          console.log(e)
+          this.watchAvatarURL.push('')
+        })
+    },
     confirmDeleteUser (user) {
       // 给服务器发消息删掉对应的id
       const nt = NetWork.getInstance()
@@ -619,10 +649,10 @@ export default {
     },
     btnChangeAvatarClick () {
       const nt = NetWork.getInstance()
-      nt.UpdateAvatar(this.imageBase64, this.$store.state.userInfo.userInfo.id)
+      nt.UpdateAvatar(this.imageByte, this.$store.state.userInfo.userInfo.id)
         .then(() => {
           this.dialogChangeAvatarVisible = false
-          this.$store.commit('setAvatar', this.imageBase64)
+          this.$store.commit('setAvatar', this.imageByte)
         })
         .catch(e => {
           console.log(e)
@@ -636,15 +666,13 @@ export default {
       reader.onload = (event) => {
         this.imageBase64 = event.target.result
         const arr = this.imageBase64.split(',')
-        const mime = arr[0].match(/:(.*?);/)[1]
         const bstr = atob(arr[1])
         let n = bstr.length
         const u8arr = new Uint8Array(n)
         while (n--) {
           u8arr[n] = bstr.charCodeAt(n)
         }
-        this.imageByte = new Blob([u8arr], { type: mime })
-        this.imageByte = bstr
+        this.imageByte = new Blob([u8arr])
       }
       reader.readAsDataURL(event.target.files[0])
     }

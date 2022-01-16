@@ -24,7 +24,6 @@
     color: #303133;
   }
   height: 100vh;
-  background-color: whitesmoke;
 }
 
 .el-menu-item {

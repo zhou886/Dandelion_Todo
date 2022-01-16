@@ -290,17 +290,18 @@ export default {
         description: todoDescription,
         deadline: todoDeadline,
         createAt: currentTime,
-        todoId: this.$store.state.userInfo.todoCount,
         parentId: 0,
+        importance: 0,
+        loaclId: 0,
         creatorId: this.$store.state.userInfo.userInfo.id
       })
 
       console.log(todoEntity)
       const nt = Network.getInstance()
       nt.CreateTODO(todoEntity, this.$store.state.userInfo.userInfo.id)
-        .then(() => {
+        .then((feedbackTodoEntity) => {
           // 服务器返回创建TODO成功，本地同步更新
-          this.$store.commit('addTodoCount')
+          todoEntity.todoId = feedbackTodoEntity.todoId
           this.$store.commit('addUndoneEntity', todoEntity)
         })
         .catch((error) => {
@@ -320,18 +321,19 @@ export default {
     },
     finishButtonClick (todoEntity) {
       // 完成TODO
-      const newTodoEntity = todoEntity
-      newTodoEntity.completeTodo()
+      console.log('finish', todoEntity)
+      todoEntity.completeTodo()
+      todoEntity.localId = 0
 
       const nt = Network.getInstance()
       nt.UpdateTODO(
-        newTodoEntity,
+        todoEntity,
         todoEntity.todoId,
         this.$store.state.userInfo.userInfo.id
       )
         .then(() => {
           // 服务器返回完成TODO成功，本地同步更新
-          this.$store.commit('addDoneEntity', newTodoEntity)
+          this.$store.commit('addDoneEntity', todoEntity)
           this.$store.commit('removeUndoneEntity', todoEntity)
         })
         .catch((error) => {

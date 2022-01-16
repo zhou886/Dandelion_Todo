@@ -25,9 +25,12 @@ class NetWork {
 
   async Login (userid, password) {
     try {
-      const res = await fetch(`${this.loc}/login?userId=${userid}&password=${password}`, {
-        method: 'POST'
-      })
+      const res = await fetch(
+        `${this.loc}/login?userId=${userid}&password=${password}`,
+        {
+          method: 'POST'
+        }
+      )
       const resJson = await res.json()
       if (resJson.status === 200) {
         this.session = resJson.data
@@ -75,24 +78,27 @@ class NetWork {
    * @param {number} userid 用户ID
    */
   async GetTodoListWithPage (limit, maxId, userid = this.currUserId) {
-    const res = await fetch(`${this.loc}/api/todo/${userid}?limid=${limit}&max_id=${maxId}`, {
-      method: 'GET',
-      headers: {
-        Authorization: this.session
+    const res = await fetch(
+      `${this.loc}/api/todo/${userid}?limid=${limit}&max_id=${maxId}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: this.session
+        }
       }
-    })
+    )
     const resStatus = await res.status
     const resJson = await res.json()
     if (resJson.status === 200 && resStatus === 200) {
       const resData = JSON.parse(resJson.data)
       const res = []
-      resData.forEach(e => {
+      resData.forEach((e) => {
         e.completeAt *= 1000
         e.createAt *= 1000
         e.deadline *= 1000
         e.updateAt *= 1000
       })
-      resData.forEach(e => res.push(new TodoEntity(e)))
+      resData.forEach((e) => res.push(new TodoEntity(e)))
       return res
     } else if (resJson != null) {
       if (resJson.status === 403) {
@@ -123,13 +129,13 @@ class NetWork {
     if (resJson.status === 200 && resStatus === 200) {
       const resData = resJson.data
       const res = []
-      resData.forEach(e => {
+      resData.forEach((e) => {
         e.completeAt *= 1000
         e.createAt *= 1000
         e.deadline *= 1000
         e.updateAt *= 1000
       })
-      resData.forEach(e => res.push(new TodoEntity(e)))
+      resData.forEach((e) => res.push(new TodoEntity(e)))
       return res
     } else if (resJson != null) {
       if (resJson.status === 403) {
@@ -155,7 +161,7 @@ class NetWork {
         Authorization: this.session,
         'content-type': 'application/json;charset=utf-8'
       },
-      body: JSON.stringify(todoList.map(e => e.parseJson()))
+      body: JSON.stringify(todoList.map((e) => e.parseJson()))
     })
     const resStatus = await res.status
     const resJson = await res.json()
@@ -176,6 +182,7 @@ class NetWork {
    * 创建Todo
    * @param {TodoEntity} todoItem TODO项
    * @param {number} userid 用户id
+   * @returns {TodoEntity}
    */
   async CreateTODO (todoItem, userid = this.currUserId) {
     const res = await fetch(`${this.loc}/api/todo/${userid}/new`, {
@@ -249,6 +256,7 @@ class NetWork {
     if (todoid === -1) {
       todoid = todoItem.todoId
     }
+    console.log('UpdateTODO', todoItem)
     const res = await fetch(`${this.loc}/api/todo/${userid}/${todoid}`, {
       method: 'PUT',
       headers: {
@@ -310,12 +318,15 @@ class NetWork {
    * @returns {number[]} userid数组
    */
   async SearchByNickname (nickname) {
-    const res = await fetch(`${this.loc}/api/user/search?nickname=${nickname}`, {
-      method: 'GET',
-      headers: {
-        Authorization: this.session
+    const res = await fetch(
+      `${this.loc}/api/user/search?nickname=${nickname}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: this.session
+        }
       }
-    })
+    )
     const resStatus = await res.status
     const resJson = await res.json()
     if (resJson.status === 200 && resStatus === 200) {
@@ -373,16 +384,12 @@ class NetWork {
       }
     })
     const resStatus = await res.status
-    const resJson = await res.json()
-    if (resJson.status === 200 && resStatus === 200) {
-      return resJson.data
-    } else if (resJson != null) {
-      if (resJson.status === 403) {
-        await this.Login(this.currUserId, this.currPassword)
-        await this.GetAvatar(userid)
-      } else {
-        throw new Error(resJson.msg)
-      }
+    if (resStatus === 200) {
+      const blob = await res.blob()
+      return blob
+    } else if (resStatus === 403) {
+      await this.Login(this.currUserId, this.currPassword)
+      return await this.GetAvatar(userid)
     } else {
       throw new Error('Network Error')
     }
@@ -398,7 +405,7 @@ class NetWork {
       method: 'POST',
       headers: {
         Authorization: this.session,
-        'content-type': 'application/json;charset=utf-8'
+        'content-type': 'image/jpeg'
       },
       body: image
     })

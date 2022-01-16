@@ -46,7 +46,9 @@ class TodoEntity {
     this.importance = EntityJson.importance
     this.localId = EntityJson.localId
     this.parentId = EntityJson.parentId
-    this.plantTime = EntityJson.plantTime
+    this.plantTime = new TimeStamp(
+      EntityJson.plantTime === undefined ? 0 : EntityJson.plantTime
+    )
     this.title = EntityJson.title
     this.todoId = EntityJson.todoId
     this.updateAt = new TimeStamp(
@@ -101,7 +103,7 @@ class TodoEntity {
       description: this.description,
       localId: this.localId,
       parentId: this.parentId,
-      plantTime: this.plantTime,
+      plantTime: this.plantTime.GetTimeStampJson(),
       title: this.title,
       todoId: this.todoId,
       updateAt: this.updateAt.GetTimeStampJson()
